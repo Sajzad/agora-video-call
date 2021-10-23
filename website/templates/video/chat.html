@@ -123,7 +123,6 @@
       window.pusher = new Pusher("14a70f173fd63bd6827c", {
         authEndpoint: "{% url 'agora:agora-pusher-auth' %}",
         cluster: 'ap1',
-        csrf_token: "{{ csrf_token }}",
         auth: { headers: { "X-CSRF-Token": "{{ csrf_token }}" } },
       });
 

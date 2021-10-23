@@ -28,10 +28,9 @@ const app = new Vue({
       // Start Pusher Presence Channel Event Listeners
 
       userOnlineChannel.bind("pusher:subscription_succeeded", (data) => {
-      	console.log(data.members)
         let members = Object.keys(data.members).map((k) => data.members[k]);
         this.onlineUsers = members;
-        console.log(members)
+        console.log("members", this.onlineUsers)
       });
 
       userOnlineChannel.bind("pusher:member_added", (data) => {
@@ -84,7 +83,6 @@ const app = new Vue({
       const onlineUserIndex = this.onlineUsers.findIndex(
         (data) => data.id === id
       );
-      console.log(onlineUserIndex)
       if (onlineUserIndex < 0) {
         return "Offline";
       }
