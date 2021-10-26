@@ -1,42 +1,18 @@
-
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Build A Scalable Video Chat Application With Agora"
-    />
-    <meta
-      name="keywords"
-      content="Video Call, Agora, Django, Real Time Engagement"
-    />
-    <meta name="author" content="Kofi Obrasi Ocran" />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
-      integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
-      crossorigin="anonymous"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{% static 'css/main.css' %}"
-    />
+{% extends 'base.html' %}
+  {% load static %}
+  {% block title %}| Chat Room{% endblock %}
+  {% block extra_head %}
     <script src="https://cdn.agora.io/sdk/release/AgoraRTCSDK-3.3.1.js"></script>
+  {% endblock %}
     <title>Agora Video Chat Django</title>
-  </head>
-  <body>
+  {% block content %}
     <main id="app">
       <main>
         <div class="container">
           <div class="row">
             <div class="col-12 text-center">
-              <h3>Video Chat App</h3>
-              <h6>{{ request.user }}</h6>
+              <h1 class="text-black" style="font-weight:600"><span class="text-warning">Video</span> Chat</h1>
+              <h4 class="badge badge-danger h4 px-2 py-1">{{ request.user }}</h4><span class="ml-3"><a href="{% url 'agora:logout' %}">Log out</a></span>
             </div>
           </div>
         </div>
@@ -71,7 +47,7 @@
                   type="button"
                   class="btn btn-danger"
                   data-dismiss="modal"
-                  @click="declineCall"
+                  @click="stopCall"
                 >
                   Decline
                 </button>
@@ -93,7 +69,6 @@
           <div id="remote-video"></div>
 
           <div class="action-btns">
-            <p>${ test }</p>
             <button
               type="button"
               class="btn btn-info"
@@ -106,16 +81,19 @@
               class="btn btn-primary mx-4"
               @click="handleVideoToggle"
             >
-              ${ mutedVideo ? "ShowVideo" : "HideVideo" }
+              ${ mutedVideo ? "Show" : "Hide" }
             </button>
-            <button type="button" class="btn btn-danger" @click="endCall">
-              EndCall
+            <button type="button" class="btn btn-danger" @click="stopCall">
+              End
             </button>
           </div>
 
         </section>
       </main>
     </main>
+  {% endblock %}
+  {% block extra_js %}
+
     <!-- Add Scripts -->
     <script src="https://js.pusher.com/7.0.3/pusher.min.js"></script>
     <script>
@@ -133,5 +111,4 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script src="{% static 'js/index.js' %}"></script>
-  </body>
-</html>
+  {% endblock %}

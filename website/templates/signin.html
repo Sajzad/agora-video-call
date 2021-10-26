@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %} Sign in{% endblock %}
+{% block extra_head %}
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% endblock %}
+{% block content %}
+	<main class="container">
+		<div class="row pt-lg-5">
+			<div class="col-lg-5 offset-lg-3">
+				<div class="card">
+					<div class="card-body">
+						<p class="h4 text-center" style="font-weight:400">Sign In</p>
+						{% if err_message %}
+							<div class="alert alert-success alert-dismissible" id="myAlert">
+						    	<button type="button" class="close">&times;</button>
+						    	<strong>Hey you!</strong> {{ err_message }}
+						  	</div>
+						{% endif %}
+						<div class="pt-5">
+							<form method="POST">
+								{% csrf_token %}
+								  <div class="form-group">
+								    <label for="email">Email address:</label>
+								    <input type="email" class="form-control" placeholder="Enter email" name="email">
+								  </div>
+								  <div class="form-group">
+								    <label for="pwd">Password:</label>
+								    <input type="password" class="form-control" placeholder="Enter password" name="pwd">
+								  </div>
+								  <button type="submit" class="btn btn-primary float-right">Submit</button>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</main>
+{% endblock %}
+{% block extra_js %}
+<script type="text/javascript">
+$(document).ready(function(){
+  $(".close").click(function(){
+    $("#myAlert").alert("close");
+  });
+
+});
+</script>
+{% endblock %}

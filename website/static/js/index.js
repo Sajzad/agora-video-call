@@ -1,5 +1,10 @@
 console.log("how are you vue");
 
+function terminateCall(){
+}
+
+terminateCall();
+
 const app = new Vue({
   el: "#app",
   delimiters: ["${", "}"],
@@ -14,7 +19,6 @@ const app = new Vue({
     incomingCall: false,
     incomingCaller: "",
     agoraChannel: null,
-    test: "testing",
   },
   mounted() {
     this.initUserOnlineChannel();
@@ -28,12 +32,15 @@ const app = new Vue({
       // Start Pusher Presence Channel Event Listeners
 
       userOnlineChannel.bind("pusher:subscription_succeeded", (data) => {
+        console.log(data.members)
         let members = Object.keys(data.members).map((k) => data.members[k]);
+        console.log(members)
         this.onlineUsers = members;
         console.log("members", this.onlineUsers)
       });
 
       userOnlineChannel.bind("pusher:member_added", (data) => {
+        console.log("data",data.info)
         let user = data.info;
         // check user availability
         const joiningUserIndex = this.onlineUsers.findIndex(
@@ -56,12 +63,26 @@ const app = new Vue({
         console.log("Subscription Error", err);
       });
 
-      userOnlineChannel.bind("an_event", (data) => {
+      userOnlineChannel.bind("decline", (data) => {
         console.log("a_channel: ", data);
-      });
+        this.incomingCall = false;
+        this.incomingCaller = "";
+        this.localStream.close();
+        this.client.leave(
+          () => {
+            console.log("Leave channel successfully");
+            this.callPlaced = false;
+          },
+          (err) => {
+            console.log("Leave channel failed");
+          }
+        );
+        pusher.unsubscribe();
+        });
 
       userOnlineChannel.bind("make-agora-call", (data) => {
-        // Listen to incoming cal l. This can be replaced with a private channel
+        // Listen to incoming call. This can be replaced with a private channel
+        console.log("agora call")
 
         if (parseInt(data.userToCall) === parseInt(AUTH_USER_ID)) {
           const callerIndex = this.onlineUsers.findIndex(
@@ -72,12 +93,26 @@ const app = new Vue({
 
           // the channel that was sent over to the user being called is what
           // the receiver will use to join the call when accepting the call.
-          this.agoraChannel = data.channelName;
+          this.agoraChannel = data.channelName;          
         }
       });
     },
     async authenticatePusher(){
       console.log(AUTH_USER, AUTH_USER_ID, CSRF_TOKEN);
+    },
+    stopCall(){
+      axios.post(
+          "/trigger-event/",
+          {
+            check: "decline"
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": CSRF_TOKEN,
+            },
+          }
+        );
     },
     getUserOnlineStatus(id) {
       const onlineUserIndex = this.onlineUsers.findIndex(
@@ -124,12 +159,6 @@ const app = new Vue({
       this.joinRoom(tokenRes.data.token, this.agoraChannel);
       this.incomingCall = false;
       this.callPlaced = true;
-    },
-
-    declineCall() {
-      // You can send a request to the caller to
-      // alert them of rejected call
-      this.incomingCall = false;
     },
 
     generateToken(channelName) {
@@ -257,7 +286,26 @@ const app = new Vue({
           console.log("Leave channel failed");
         }
       );
-      window.pusher.unsubscribe();
+      pusher.unsubscribe();
+    },
+    declineCall() {
+      // You can send a request to the caller to
+      // alert them of rejected call
+      this.incomingCall = false;
+              this.incomingCall = false;
+        this.incomingCaller = "";
+        this.localStream.close();
+        this.client.leave(
+          () => {
+            console.log("Leave channel successfully");
+            this.callPlaced = false;
+          },
+          (err) => {
+            console.log("Leave channel failed");
+          }
+        );
+        pusher.unsubscribe();
+
     },
 
     handleAudioToggle() {

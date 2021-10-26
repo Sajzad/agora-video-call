@@ -11,12 +11,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-b0-&9r_e_py*t04324tf!e%pp+l+$8x!lkjo(@*463q1(5@!9u'
+SECRET_KEY = os.environ["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [".197f-103-214-202-34.ngrok.io", "127.0.0.1"]
 
 
 # Application definition
@@ -122,3 +122,5 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static_root/")
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = "agora:agora-index"
