@@ -36,11 +36,22 @@ This README would normally document whatever steps are necessary to get your app
 
 * Create an account from this Sign Up link ```http://127.0.0.1:8000/signup``` and you will be redirected to Video chat room.
 
-* Create another account from incognito mode. Now we will be able to see who is online and we can make a call. As soon as the call is acceped by other end, video streaming will be initiated.
+* Create another account from incognito mode. Now we will be able to see who is online and we can make a call. As soon as the call is acceped by the other end, video streaming will be initiated.
 
-### How do I make a video call ###
+# I have attached few screen-shot here`
 
 1. Post signin you will be redirected to a chat room like below
 ![video_1](https://user-images.githubusercontent.com/42478821/148390664-9de7bad5-8393-4f6e-b4b0-9cbfeef93313.png)
+
+2. After placing a call so somebody, a notification will be appeared at the receiver end like below. 
+
+![video2](https://user-images.githubusercontent.com/42478821/148391161-9f12734f-0846-41ab-9e53-e8538e2226bb.png)
+
+3. Upon accepted the request video streaming will be intiated and call can be controlled.
+
+![video_chat](https://user-images.githubusercontent.com/42478821/148391325-08af9eb5-cdb6-4699-9c25-487d39f65b91.png)
+
+N.B.: For any issue, Please feel free to ocntact with me via following email address
+sajzadhasan@gmail.com
 
 
