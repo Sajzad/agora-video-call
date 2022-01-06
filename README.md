@@ -38,7 +38,7 @@ This README would normally document whatever steps are necessary to get your app
 
 * Create another account from incognito mode. Now we will be able to see who is online and we can make a call. As soon as the call is acceped by the other end, video streaming will be initiated.
 
-# I have attached few screen-shot here`
+# I have attached few screen-shot here
 
 1. Post signin you will be redirected to a chat room like below
 ![video_1](https://user-images.githubusercontent.com/42478821/148390664-9de7bad5-8393-4f6e-b4b0-9cbfeef93313.png)
