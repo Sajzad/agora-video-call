@@ -13,63 +13,57 @@ from django.views.decorators.csrf import csrf_exempt
 from .agora_key.RtcTokenBuilder import RtcTokenBuilder, Role_Attendee
 from pusher import Pusher
  
-
-from .models import Session
-
-
-# /home/sajjad/Desktop/sv/django/agora
-config = {
-    "apiKey": "AIzaSyC-6M8is3lP1dAhbjLZujUDSJ7egiKMgK8",
-    "authDomain": "agora-8783f.firebaseapp.com",
-    "projectId": "agora-8783f",
-    "storageBucket": "agora-8783f.appspot.com",
-    "messagingSenderId": "822344920295",
-    "appId": "1:822344920295:web:9224f2fd57cfd563854642",
-    "databaseURL": "https://agora-8783f-default-rtdb.asia-southeast1.firebasedatabase.app",
-    "measurementId": "G-LX5JC9VECY"    
-}
-# Initialising database,auth and firebase for further use
-firebase=pyrebase.initialize_app(config)
-authe = firebase.auth()
-database=firebase.database()
+from .models import User
 
 
-def is_logged_in(func=None):
-    def inner(request):
-        if request.session:
-            session_id = ""
-            try:
-                session_id = request.session['uid']
-                print(session_id)
-            except:
-                pass
-            if Session.objects.filter(session_id=session_id).exists():
-                pass
-            else:
-                return redirect('agora:signin')
-        else:
-            return redirect('agora:signin')
 
-    return inner
+def init_firebase():
+    """
+        Initialize Firebase with config credentials.
+    """
+    config = {
+        "apiKey": os.environ.get("FIREBASE_API_KEY"),
+        "authDomain": os.environ.get("FIREBASE_AUTH_DOMAIN"),
+        "projectId": os.environ.get("FIREBASE_PROJECT_ID"),
+        "storageBucket": os.environ.get("FIREBASE_STORAGE_BUCKET"),
+        "messagingSenderId": os.environ.get("FIREBASE_SENDER_ID"),
+        "appId": os.environ.get("FIREBASE_APP_ID"),
+        "databaseURL": os.environ.get("FIREBASE_DATABASE_URL"),
+        # "measurementId": os.environ.get("FIREBASE_MEASUREMENT_ID")    
+    }
+    # Initialising database,auth and firebase for further use
+
+    return pyrebase.initialize_app(config)
+# database=firebase.database()
 
 def chat(request):
+    """
+        Chat room views upon logged in.
+        local vars:
+            users: reponsible for all registered memebered for the chatroom.
+    """
+    # to make sure user is logged in
     if request.session:
         session_id = ""
-        all_users = ""
+        users = ""
         try:
             session_id = request.session['uid']
-            print(session_id)
         except:
             pass
-        if Session.objects.filter(session_id=session_id).exists():
-            User = get_user_model()
-            all_users = User.objects.exclude(id=request.user.id).only('id', 'username')
+        if session_id:
+            users = User.objects.exclude(user=request.session['user'])
+            user = User.objects.get(user=request.session['user'])
         else:
-            return redirect("agora:agora-index")
+            return redirect("agora:signin")
     else:
-        return redirect("agora:agora-index")
+        return redirect("agora:signin")
 
-    return render(request, 'video/chat.html', {'allUsers': all_users})
+    context = {
+        "users": users,
+        "user" : user
+    }
+
+    return render(request, 'video/chat.html', context)
 
 def init_pusher():
     """
@@ -84,33 +78,36 @@ def init_pusher():
     return pusher_client
 
 def signin_view(request):
+    """
+        Signin view which will take email and password for authentication with Firebase. On successful authentication, user will be
+        redirected to chat room.
+    """
+    err_message = ""
+
     if request.session:
         session_id = ""
         try:
             session_id = request.session['localId']
         except:
             pass
-        if Session.objects.filter(session_id=session_id).exists():
+        if session_id:
             return redirect("agora:agora-index")
 
-    err_message = ""
     if request.method == "POST":
         email = request.POST.get('email')
         pwd = request.POST.get('pwd')
         try:
-            user=authe.sign_in_with_email_and_password(email,pwd)
-            print(user)
+            authe = init_firebase().auth()
+            user = authe.sign_in_with_email_and_password(email,pwd)
             if user['localId']:
-                Session.objects.create(session_id=user['localId'])
                 request.session['uid'] = user['localId']
+                user = User.objects.filter(email__contains = email)[0].user
+                request.session['user'] = user
                 return redirect("agora:agora-index")
 
         except requests.HTTPError as e:
             r = json.loads(e.args[1])
             err_message = r['error']['message']
-            print(type(err_message))
-            print(err_message)
-        print(email, pwd)
 
     context = {
 
@@ -119,9 +116,12 @@ def signin_view(request):
     return render(request, 'signin.html', context)
 
 def logout_view(request):
+    """
+        Session_key will be deleted upon log out request.
+    """
     try:
-        Session.objects.filter(session_id=request.session['uid']).delete()
         del request.session['uid']
+        del request.session['user']
     except:
         pass
     return redirect("agora:signin")
@@ -129,25 +129,53 @@ def logout_view(request):
     return render(request, "signin.html")
 
 def signup_view(request):
+
+    err_message = ''
+
+    if request.method == "POST":
+        user = request.POST.get("username")
+        email = request.POST.get("email")
+        pwd1 = request.POST.get("pwd1")
+        pwd2 = request.POST.get("pwd2")
+        if pwd1 != pwd2:
+            err_message = "Password doesn't match"
+        elif User.objects.filter(user=user).exists():
+            err_message = "User already exists!"        
+        elif User.objects.filter(email=email).exists():
+            err_message = "Email already exists!"
+        else:
+            try:
+                authe = init_firebase().auth()
+                auth=authe.create_user_with_email_and_password(email,pwd1)
+            except Exception as e:
+                print(e)
+                print(dir(e))
+            User.objects.create(user=user, email=email)
+            request.session['uid'] = auth['localId']
+            request.session['user'] = user
+            return redirect("agora:agora-index")
+
+        print(user, email, pwd2, pwd1)
+
     context = {
-    
+        "err_message":err_message
     }
     return render(request, 'signup.html', context)
 
 @csrf_exempt
 def pusher_auth(request):
     pusher_client = init_pusher()
+    user = User.objects.filter(user=request.session['user'])[0]
     payload = pusher_client.authenticate(
         channel=request.POST['channel_name'],
         socket_id=request.POST['socket_id'],
         custom_data={
-            'user_id': request.user.id,
+            'user_id': user.id,
             'user_info': {
-                'id': request.user.id,
-                'name': request.user.username
+                'id': user.id,
+                'name': user.user
             }
         })
-    print(payload)
     return JsonResponse(payload)
 
 
@@ -156,9 +184,8 @@ def generate_agora_token(request):
     appID = os.environ.get("AGORA_APP_ID")    
     appCertificate = os.environ.get("AGORA_CERTIFICATE") 
 
-    channelName = json.loads(request.body.decode(
-        'utf-8'))['channelName']
-    userAccount = request.user.username
+    channelName = json.loads(request.body.decode('utf-8'))['channelName']
+    userAccount = request.session['user']
     expireTimeInSeconds = 3600
     currentTimestamp = int(time.time())
     privilegeExpiredTs = currentTimestamp + expireTimeInSeconds
@@ -170,11 +197,14 @@ def generate_agora_token(request):
 
 
 def call_user(request):
+    """
+        Placing call requests to the other with websocket and creating a presence channel using pusher so that any event during 
+        video call can be triggered in real time.
+    """
     body = json.loads(request.body.decode('utf-8'))
-    print(body)
     user_to_call = body['user_to_call']
     channel_name = body['channel_name']
-    caller = request.user.id
+    caller = request.session['user']
     pusher_client = init_pusher()
     pusher_client.trigger(
         'presence-online-channel',
@@ -188,6 +218,9 @@ def call_user(request):
     return JsonResponse({'message': 'call has been placed'})
 
 def trigger_event(request):
+    """
+        To trigger a decline event to the presence channel to stop streaming on declining call or ending call.
+    """
     data = json.loads(request.body)
     check = data['check']
     pusher_client = init_pusher()

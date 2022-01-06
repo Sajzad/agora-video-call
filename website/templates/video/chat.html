@@ -12,7 +12,12 @@
           <div class="row">
             <div class="col-12 text-center">
               <h1 class="text-black" style="font-weight:600"><span class="text-warning">Video</span> Chat</h1>
-              <h4 class="badge badge-danger h4 px-2 py-1">{{ request.user }}</h4><span class="ml-3"><a href="{% url 'agora:logout' %}">Log out</a></span>
+              <p class="h6 px-2 py-1" style="font-weight:600">Welcome <span class="text-primary">{{ request.session.user }}</span>
+                <span class="ml-3">
+                  <a href="{% url 'agora:logout' %}">Log out
+                  </a>
+                </span>
+              </p>
             </div>
           </div>
         </div>
@@ -20,19 +25,18 @@
           <div class="row">
             <div class="col">
               <div class="btn-group" role="group">
-                {% for singleUser in allUsers%}
-                <button
-                  type="button"
-                  class="btn btn-primary mr-2"
+                {% for user in users %}
+                  <button
+                    type="button"
+                    class="btn btn-primary mr-2"
 
-                  @click="placeCall('{{singleUser.id}}','{{singleUser}}')"
-                >
-                  Call {{ singleUser }}
-                  <span class="badge badge-light"
-                    >${ getUserOnlineStatus({{singleUser.id}})}</span
+                    @click="placeCall('{{ user.id }}','{{ user.user }}')"
                   >
-                </button>
-
+                    Call {{ user.user }}
+                    <span class="badge badge-light"
+                      >${ getUserOnlineStatus({{ user.id }})}</span
+                    >
+                  </button>
                 {% endfor %}
               </div>
             </div>
@@ -102,10 +106,11 @@
         authEndpoint: "{% url 'agora:agora-pusher-auth' %}",
         cluster: 'ap1',
         auth: { headers: { "X-CSRF-Token": "{{ csrf_token }}" } },
+        x:"this",
       });
 
-      const AUTH_USER = "{{user}}";
-      const AUTH_USER_ID =  "{{request.user.id}}";
+      const AUTH_USER = "{{ user.user }}";
+      const AUTH_USER_ID =  "{{ user.id }}";
       const CSRF_TOKEN = "{{ csrf_token }}";
     </script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>

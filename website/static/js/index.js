@@ -22,7 +22,6 @@ const app = new Vue({
   },
   mounted() {
     this.initUserOnlineChannel();
-    this.authenticatePusher();
   },
 
   methods: {
@@ -32,11 +31,10 @@ const app = new Vue({
       // Start Pusher Presence Channel Event Listeners
 
       userOnlineChannel.bind("pusher:subscription_succeeded", (data) => {
-        console.log(data.members)
-        let members = Object.keys(data.members).map((k) => data.members[k]);
-        console.log(members)
+        console.log("data members", data)
+        let members = Object.keys(data.members).map((j) => data.members[j]);
+        console.log("new",members)
         this.onlineUsers = members;
-        console.log("members", this.onlineUsers)
       });
 
       userOnlineChannel.bind("pusher:member_added", (data) => {
@@ -82,23 +80,13 @@ const app = new Vue({
 
       userOnlineChannel.bind("make-agora-call", (data) => {
         // Listen to incoming call. This can be replaced with a private channel
-        console.log("agora call")
-
-        if (parseInt(data.userToCall) === parseInt(AUTH_USER_ID)) {
-          const callerIndex = this.onlineUsers.findIndex(
-            (user) => user.id === data.from
-          );
-          this.incomingCaller = this.onlineUsers[callerIndex]["name"];
+        if (data.userToCall === AUTH_USER) {
+          this.incomingCaller = data.from;
           this.incomingCall = true;
-
-          // the channel that was sent over to the user being called is what
-          // the receiver will use to join the call when accepting the call.
-          this.agoraChannel = data.channelName;          
+          this.agoraChannel = data.channelName;
+          console.log("channel name",data.channelName);        
         }
       });
-    },
-    async authenticatePusher(){
-      console.log(AUTH_USER, AUTH_USER_ID, CSRF_TOKEN);
     },
     stopCall(){
       axios.post(
@@ -115,6 +103,7 @@ const app = new Vue({
         );
     },
     getUserOnlineStatus(id) {
+      console.log("online",this.onlineUsers);
       const onlineUserIndex = this.onlineUsers.findIndex(
         (data) => data.id === id
       );
@@ -134,7 +123,7 @@ const app = new Vue({
         let placeCallRes = await axios.post(
           "/call-user/",
           {
-            user_to_call: id,
+            user_to_call: calleeName,
             channel_name: channelName,
           },
           {
@@ -155,7 +144,7 @@ const app = new Vue({
     async acceptCall() {
       const tokenRes = await this.generateToken(this.agoraChannel);
       this.initializeAgora(tokenRes.data.appID);
-
+      console.log("acceptCall", tokenRes.data.token, this.agoraChannel);
       this.joinRoom(tokenRes.data.token, this.agoraChannel);
       this.incomingCall = false;
       this.callPlaced = true;
