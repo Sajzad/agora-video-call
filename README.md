@@ -41,5 +41,6 @@ This README would normally document whatever steps are necessary to get your app
 ### How do I make a video call ###
 
 1. Post signin you will be redirected to a chat room like below
+![video_1](https://user-images.githubusercontent.com/42478821/148390664-9de7bad5-8393-4f6e-b4b0-9cbfeef93313.png)
 
 
