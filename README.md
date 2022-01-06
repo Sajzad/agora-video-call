@@ -10,19 +10,19 @@ This README would normally document whatever steps are necessary to get your app
 
 ### How do I get set up? ###
 
-* Clone the repo: ```git clone https://github.com/crastonic/candidate-Mohammad-Rabeul-Hasan.git```.
+* Clone the repo: ```git clone https://github.com/Sajzad/agora-video-call.git```.
 
 * Install virtualenv on your system. For linux: ```pip install virtualenv```.
 
-* Go to candidate-Mohammad-Rabeul-Hasan dir. And create virtual environment with virtualenv: ```virtualenv -p /usr/bin/python3 .env```.
+* Go to agora-video-call dir. And create virtual environment with virtualenv: ```virtualenv -p /usr/bin/python3 .env```.
 
 * Activate the virtual environment: source ```.env/bin/activate```.
 
 * Install required dependencies: ```pip install -r requirements.txt```.
 
-* Set these environment variables which is forwarded via email with corresponding values.
+* Set these environment variables which should be forwarded via email with corresponding values.
 
-* Go to website dir where the manage.py file.
+* Go to website dir where the manage.py file is.
 
 * Create migrations files: ```./manage.py makemigrations```.
 
@@ -51,7 +51,7 @@ This README would normally document whatever steps are necessary to get your app
 
 ![video_chat](https://user-images.githubusercontent.com/42478821/148391325-08af9eb5-cdb6-4699-9c25-487d39f65b91.png)
 
-Please feel free to contact me If you require any further assistance
+Hope you enjoyed the project. Please feel free to contact me If require any further assistance
 sajzadhasan@gmail.com
 
 
