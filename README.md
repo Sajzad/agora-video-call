@@ -1,7 +1,7 @@
 # agora-video-call
 This README would normally document whatever steps are necessary to get your application up and running.
 
-### Tech. used in the porject? ###
+### Tech. used in the porject- ###
 
 * Agora SDK
 * Pusher
