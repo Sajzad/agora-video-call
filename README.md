@@ -51,7 +51,7 @@ This README would normally document whatever steps are necessary to get your app
 
 ![video_chat](https://user-images.githubusercontent.com/42478821/148391325-08af9eb5-cdb6-4699-9c25-487d39f65b91.png)
 
-N.B.: For any issue, Please feel free to ocntact with me via following email address
+N.B.: For any issue, Please feel free to contact with me via following email address
 sajzadhasan@gmail.com
 
 
